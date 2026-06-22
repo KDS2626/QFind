@@ -15,6 +15,8 @@ from datetime import datetime, date as date_cls, timedelta
 
 import httpx
 from mcp.server.fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse
 
 # host="0.0.0.0" + PORT 환경변수: 클라우드(Render 등)에서 외부 접속을 받기 위함
 mcp = FastMCP(
@@ -31,6 +33,12 @@ ENDPOINTS = {
     "cafe": "https://dapi.kakao.com/v2/search/cafe",
     "web": "https://dapi.kakao.com/v2/search/web",
 }
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health(request: Request) -> PlainTextResponse:
+    """상태 확인용 엔드포인트. 외부 모니터링이 주기적으로 찔러 서버를 깨어 있게 한다."""
+    return PlainTextResponse("ok")
 
 
 def _clean(text: str) -> str:
