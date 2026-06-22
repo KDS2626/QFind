@@ -1,0 +1,14 @@
+# Render 배포 설정 (Blueprint)
+# Render 대시보드에서 이 저장소를 연결하면 자동으로 이 설정대로 배포된다.
+services:
+  - type: web
+    name: recent-search-mcp
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: MCP_TRANSPORT
+        value: streamable-http
+      - key: KAKAO_REST_API_KEY
+        sync: false
