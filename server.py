@@ -15,6 +15,7 @@ from datetime import datetime, date as date_cls, timedelta
 
 import httpx
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 
@@ -57,7 +58,15 @@ def _parse_dt(s: str) -> datetime | None:
         return None
 
 
-@mcp.tool()
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="QFind 최신 게시물 검색",
+        readOnlyHint=True,       # 데이터를 읽기만 함 (생성/수정/삭제 없음)
+        destructiveHint=False,   # 파괴적 동작 없음
+        idempotentHint=True,     # 같은 입력이면 부작용 없이 동일하게 동작
+        openWorldHint=True,      # 외부(카카오 검색 API)와 통신함
+    )
+)
 async def search_recent(
     query: str,
     date: str | None = None,
@@ -66,7 +75,9 @@ async def search_recent(
     source: str = "blog",
     size: int = 10,
 ) -> str:
-    """키워드로 최신 게시물(블로그/카페/웹)을 검색한다.
+    """QFind — 키워드로 최신 게시물(블로그/카페/웹)을 검색한다.
+
+    (QFind는 카카오 검색 API 기반의 최신 게시물 검색 도구입니다.)
 
     예) query="성수동 OO카페", date="2026-06-22", days=3, exclude=["광고", "협찬"]
         → 6/19~6/22 사이에 올라온 글 중 광고·협찬 글을 뺀 최신 결과.
